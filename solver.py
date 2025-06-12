@@ -2,6 +2,13 @@
 """Wordle solving utilities using frequency and entropy strategies."""
 from collections import Counter, defaultdict
 import math
+import random
+
+
+def load_words(path="words.txt"):
+    """Load five-letter candidate words from a text file."""
+    with open(path, "r", encoding="utf-8") as f:
+        return [w.strip() for w in f if len(w.strip()) == 5]
 
 
 def _feedback(guess: str, answer: str) -> str:
@@ -84,18 +91,17 @@ def solve_wordle(candidates, correct_word):
             guess = select_best_entropy_word(remaining)
         attempts.append(guess)
         feedback = _feedback(guess, correct_word)
-        print(f"Attempt {len(attempts)}: {guess} -> {feedback} (remaining: {len(remaining)})")
-        if guess == correct_word:
-            break
-        # filter remaining by feedback pattern
         remaining = [w for w in remaining if _feedback(guess, w) == feedback]
-        if not remaining:
+        print(
+            f"Attempt {len(attempts)}: {guess} -> {feedback} (remaining: {len(remaining)})"
+        )
+        if guess == correct_word or not remaining:
             break
     return attempts
 
 
 if __name__ == "__main__":
-    sample_candidates = [
-        "trace", "crate", "react", "caret", "cater", "relay", "early", "layer"
-    ]
-    solve_wordle(sample_candidates, correct_word="relay")
+    words = load_words()
+    answer = random.choice(words)
+    print(f"Randomly selected correct word: {answer}")
+    solve_wordle(words, correct_word=answer)
